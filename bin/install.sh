@@ -2,27 +2,33 @@
 #
 # Usage:
 #   bin/install.sh [--dry-run]
+#   bin/install.sh --uninstall [--dry-run]
 #   bin/install.sh --help
 #
 # Safety:
 #   This script links global Codex and Claude Code configuration to this
 #   repository. Changes in the repository then affect both tools immediately.
 #   Existing conflicting files, directories, and third-party symlinks are moved
-#   to a timestamped backup. Obsolete skill links from this Git repository are
+#   to a timestamped backup. Obsolete links from this Git repository are
 #   removed, including symlink backups created by earlier installer runs.
+#   Installing from a linked Git worktree is refused: deleting that worktree
+#   would break the global configuration of both tools at once.
 
 set -euo pipefail
 
 usage() {
     printf '%s\n' \
         'Usage: bin/install.sh [--dry-run]' \
+        '       bin/install.sh --uninstall [--dry-run]' \
         '       bin/install.sh --help' \
         '' \
         'Link this repository to the global Codex and Claude Code config.' \
         '' \
         'Options:' \
-        '  --dry-run  Show planned changes without modifying anything.' \
-        '  -h, --help Show this help.'
+        '  --dry-run   Show planned changes without modifying anything.' \
+        '  --uninstall Remove the links this repository installed and leave' \
+        '              everything else in place.' \
+        '  -h, --help  Show this help.'
 }
 
 status() {
@@ -36,11 +42,15 @@ die() {
     exit 1
 }
 
-resolve_git_common_dir() {
+# Print an absolute, symlink-free Git directory for a checkout. The flag selects
+# which one: --git-common-dir is shared by every worktree of a repository and
+# identifies the repository, --git-dir is specific to one worktree.
+resolve_git_path() {
     local checkout=$1
+    local flag=$2
     local git_dir
 
-    git_dir=$(git -C "$checkout" rev-parse --git-common-dir 2>/dev/null) || return 1
+    git_dir=$(git -C "$checkout" rev-parse "$flag" 2>/dev/null) || return 1
     if [[ $git_dir != /* ]]; then
         git_dir="$checkout/$git_dir"
     fi
@@ -48,12 +58,20 @@ resolve_git_common_dir() {
     CDPATH= cd -- "$git_dir" && pwd -P
 }
 
+resolve_git_common_dir() {
+    resolve_git_path "$1" --git-common-dir
+}
+
 dry_run=false
+uninstall_mode=false
 
 while (($# > 0)); do
     case $1 in
         --dry-run)
             dry_run=true
+            ;;
+        --uninstall)
+            uninstall_mode=true
             ;;
         -h | --help)
             usage
@@ -186,6 +204,94 @@ ensure_skill_dir() {
     fi
 }
 
+# Refuse to install from a linked worktree. Its path disappears when the
+# worktree is pruned, which would leave the global instructions and every skill
+# dangling in Codex and Claude Code at the same time. In the main checkout the
+# worktree Git directory and the shared Git directory are the same path.
+assert_main_checkout() {
+    local worktree_git_dir
+    local main_checkout=''
+
+    worktree_git_dir=$(resolve_git_path "$repo_dir" --git-dir) || die "Could not identify Git repository: $repo_dir"
+    [[ $worktree_git_dir != "$repo_git_dir" ]] || return 0
+
+    main_checkout=$(git -C "$repo_dir" worktree list --porcelain 2>/dev/null |
+        awk 'NR == 1 && $1 == "worktree" { print substr($0, 10); exit }') || main_checkout=''
+
+    die "Refusing to link global config to the worktree $repo_dir. Run bin/install.sh from ${main_checkout:-the main checkout} instead."
+}
+
+remove_link() {
+    local target=$1
+    local link_source=$2
+
+    if $dry_run; then
+        status DRY-RUN "Would remove link $target -> $link_source"
+    elif rm -- "$target"; then
+        status REMOVE "$target -> $link_source"
+    else
+        die "Could not remove link: $target"
+    fi
+}
+
+# A backup link whose target no longer exists cannot be attributed to this
+# repository, so it is reported instead of removed.
+warn_dangling_backup() {
+    local target=$1
+    local link_source=$2
+
+    [[ ${target##*/} == *.backup.* ]] || return 0
+    status WARN "Dangling backup link, remove by hand if it is stale: $target -> $link_source"
+}
+
+# Resolve a symlink to an absolute path without requiring the target to exist.
+read_link_source() {
+    local target=$1
+    local link_source
+
+    link_source=$(readlink -- "$target") || die "Could not read symlink: $target"
+    if [[ $link_source != /* ]]; then
+        link_source="$(dirname -- "$target")/$link_source"
+    fi
+
+    printf '%s\n' "$link_source"
+}
+
+# Remove instruction links this repository owns from a config directory. Only
+# symlinks pointing at an AGENTS.md inside this repository qualify, so real
+# files and third-party links are never touched. During install this clears the
+# symlink backups older runs left behind; during uninstall it also clears the
+# active link.
+remove_obsolete_config_links() {
+    local dir=$1
+    local name=$2
+    local targets=("$dir/$name".backup.*)
+    local target
+    local link_source
+    local source_dir
+    local source_git_dir
+
+    if $uninstall_mode; then
+        targets+=("$dir/$name")
+    fi
+
+    for target in "${targets[@]}"; do
+        [[ -L $target ]] || continue
+
+        link_source=$(read_link_source "$target")
+        [[ ${link_source##*/} == 'AGENTS.md' ]] || continue
+
+        if ! source_dir=$(CDPATH= cd -- "$(dirname -- "$link_source")" 2>/dev/null && pwd -P); then
+            warn_dangling_backup "$target" "$link_source"
+            continue
+        fi
+        source_git_dir=$(resolve_git_common_dir "$source_dir") || continue
+        [[ $source_git_dir == "$repo_git_dir" ]] || continue
+
+        remove_link "$target" "$link_source"
+    done
+}
+
 remove_obsolete_skill_links() {
     local dir=$1
     local target
@@ -200,12 +306,12 @@ remove_obsolete_skill_links() {
     for target in "$dir"/*; do
         [[ -L $target ]] || continue
 
-        link_source=$(readlink -- "$target") || die "Could not read symlink: $target"
-        if [[ $link_source != /* ]]; then
-            link_source="$(dirname -- "$target")/$link_source"
-        fi
+        link_source=$(read_link_source "$target")
 
-        source_dir=$(CDPATH= cd -- "$(dirname -- "$link_source")" 2>/dev/null && pwd -P) || continue
+        if ! source_dir=$(CDPATH= cd -- "$(dirname -- "$link_source")" 2>/dev/null && pwd -P); then
+            warn_dangling_backup "$target" "$link_source"
+            continue
+        fi
         source_repo_dir=$(CDPATH= cd -- "$source_dir/.." 2>/dev/null && pwd -P) || continue
         [[ $source_dir == "$source_repo_dir/skills" ]] || continue
 
@@ -217,18 +323,14 @@ remove_obsolete_skill_links() {
         current_source="$skills_source/$source_name"
 
         if [[ $target_name == "$source_name" ]]; then
-            [[ -d $current_source && $target -ef $current_source ]] && continue
+            if ! $uninstall_mode && [[ -d $current_source && $target -ef $current_source ]]; then
+                continue
+            fi
         elif [[ $target_name != "$source_name.backup."* ]]; then
             continue
         fi
 
-        if $dry_run; then
-            status DRY-RUN "Would remove obsolete skill link $target -> $link_source"
-        elif rm -- "$target"; then
-            status REMOVE "$target -> $link_source"
-        else
-            die "Could not remove obsolete skill link: $target"
-        fi
+        remove_link "$target" "$link_source"
     done
 }
 
@@ -258,13 +360,33 @@ ensure_link() {
 }
 
 status INFO "Repository: $repo_dir"
-$dry_run && status INFO 'Dry run enabled. No files will be changed.'
+if $dry_run; then
+    status INFO 'Dry run enabled. No files will be changed.'
+fi
+
+if $uninstall_mode; then
+    remove_obsolete_config_links "$codex_dir" 'AGENTS.md'
+    remove_obsolete_config_links "$claude_dir" 'CLAUDE.md'
+    remove_obsolete_skill_links "$agents_skills_dir"
+    remove_obsolete_skill_links "$claude_skills_dir"
+
+    if $dry_run; then
+        status DONE 'Dry run complete.'
+    else
+        status DONE 'Global agent configuration uninstalled. Backups of foreign files were left in place.'
+    fi
+    exit 0
+fi
+
+assert_main_checkout
 
 ensure_config_dir "$codex_dir"
 ensure_config_dir "$claude_dir"
 ensure_skill_dir "$agents_skills_dir"
 ensure_skill_dir "$claude_skills_dir"
 
+remove_obsolete_config_links "$codex_dir" 'AGENTS.md'
+remove_obsolete_config_links "$claude_dir" 'CLAUDE.md'
 remove_obsolete_skill_links "$agents_skills_dir"
 remove_obsolete_skill_links "$claude_skills_dir"
 
