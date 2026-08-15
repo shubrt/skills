@@ -38,7 +38,11 @@ secrets, private URLs, or local filesystem paths.
 
 ## UI Mocks
 
-When the user asks for variants:
+Any non-trivial UI, layout, or copy change starts here rather than in the real
+components. Build several distinct static mocks, publish them, report the URL,
+and stop. Wait for a pick before implementing anything.
+
+When rendering variants:
 
 -  Render real styled variants, not descriptions.
 -  Label them `A`, `B`, `C`... for easy selection.

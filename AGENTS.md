@@ -34,7 +34,7 @@ I wanted to share some of my preferences here so we can be more aligned as we wo
 
 ## Visual and design work
 
-* Do not edit real components first. For any non-trivial UI, layout, or copy change, build several distinct static mocks, publish them with the `pushdraft` skill, report the URL, and stop. Wait for a pick before implementing.
+* Do not edit real components first. Any non-trivial UI, layout, or copy change starts as mocks in the `pushdraft` skill, which holds that procedure.
 * Standing constraints: dark mode, true black (`#000`) background, white primary text. Information-dense, no decorative card/pill chrome, no light-gray subtitle lines above sections. Minimal copy. No em dashes.
 * Avoid continuously repainting CSS animations (pulse, shimmer, blur, spinners); they peg the GPU on high-refresh displays.
 
@@ -44,9 +44,4 @@ I wanted to share some of my preferences here so we can be more aligned as we wo
 
 ## Pull Requests
 
-* Make sure titles follow conventions from the repo. They should be simple and easy to understand. Conventional commit styles in projects that use them, i.e. "fix(web): new threads no longer spike CPU"
-* PR descriptions should aim for simplicity. Open with a minimal, clear description of the problem. Follow up with how you solved it.
-* Add a blurb to the end of the PR description about what model and harness is making the changes.
-* **Open a real PR, not a draft.** Drafts do not get review-bot coverage.
-* **Rebase onto latest `main` before opening.** Stale branches conflict and waste a review round.
-* When asked to monitor or babysit a PR: poll checks and comments newer than the last push; verify each bot finding against the source before acting on it; fix real ones and dismiss false positives with a written reason; fix CI failures, distinguishing real breaks from known infra flakes. If nothing is new, stay quiet — do not post filler comments.
+* Open PRs with the `open-pr` skill, monitor them with `babysit-pr`. The skills hold the procedure: title conventions, description shape, rebase, no drafts, and the closing note about model and harness.
