@@ -33,6 +33,16 @@ From another working directory, run the script using its absolute path:
 /path/to/forge/bin/install.sh
 ```
 
+Installation only runs from the main checkout. A linked Git worktree is refused, because removing that worktree would break the global configuration of both tools at once. The error message names the correct path.
+
+## Uninstallation
+
+```bash
+./bin/install.sh --uninstall
+```
+
+This removes the instruction and skill symlinks that point into this repository, in both tools, and leaves everything else untouched. Backups of foreign files stay in place. Unlike installation, this also works from a worktree. Combine it with `--dry-run` to see the plan first.
+
 ## What gets installed
 
 The global instructions are linked directly:
@@ -66,7 +76,9 @@ If a target already contains another file, directory, or incorrect symlink, the 
 
 Backups of conflicting files, directories, and third-party symlinks are never deleted automatically. The script does not overwrite existing configuration and can be run repeatedly. Correct symlinks remain unchanged.
 
-When a skill is removed from this repository, the next install removes its stale symlinks. It also removes Forge symlink backups left by older installer runs. The installer recognizes Forge links across Git worktrees, while symlinks to third-party skill directories remain unchanged.
+When a skill is removed from this repository, the next install removes its stale symlinks. It also removes Forge symlink backups left by older installer runs, both in the skill directories and next to `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md`. The installer recognizes Forge links across Git worktrees, while symlinks to third-party skill directories remain unchanged.
+
+A backup symlink whose target no longer exists cannot be attributed to this repository. The installer reports it as `WARN` and leaves the removal to you.
 
 To restore a backup, remove the generated symlink and move the backup to its original name.
 
