@@ -30,4 +30,8 @@ GOOD
 
 > ✅ My "new worktree" default was ignored when starting new threads on existing worktrees. Super unintuitive. Now your preferences always apply.
 
+Rebase onto the latest `origin/main` before opening. A stale branch conflicts and wastes a review round.
+
 Open a real PR rather than a draft so review bots run.
+
+Close the description with a line naming the model and harness that built the change.
