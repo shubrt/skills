@@ -54,7 +54,7 @@ separate permission or stop at the local file.
 1. Write the HTML file locally.
 2. Run `npx pushdraft upload <file path>`.
 3. After the upload succeeds, delete that exact local HTML file.
-4. Report the deleted local path and returned Pushdraft URL.
+4. Report the returned Pushdraft URL.
 
 Re-create and upload the same absolute path to update the existing URL. Use
 `npx pushdraft upload <file path> --new` only when a new draft is wanted.
