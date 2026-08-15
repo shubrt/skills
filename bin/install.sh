@@ -7,8 +7,9 @@
 # Safety:
 #   This script links global Codex and Claude Code configuration to this
 #   repository. Changes in the repository then affect both tools immediately.
-#   Existing conflicting files, directories, and symlinks are moved to a
-#   timestamped backup. Backups are never deleted automatically.
+#   Existing conflicting files, directories, and third-party symlinks are moved
+#   to a timestamped backup. Obsolete skill links from this Git repository are
+#   removed, including symlink backups created by earlier installer runs.
 
 set -euo pipefail
 
@@ -33,6 +34,18 @@ status() {
 die() {
     status ERROR "$*" >&2
     exit 1
+}
+
+resolve_git_common_dir() {
+    local checkout=$1
+    local git_dir
+
+    git_dir=$(git -C "$checkout" rev-parse --git-common-dir 2>/dev/null) || return 1
+    if [[ $git_dir != /* ]]; then
+        git_dir="$checkout/$git_dir"
+    fi
+
+    CDPATH= cd -- "$git_dir" && pwd -P
 }
 
 dry_run=false
@@ -75,6 +88,7 @@ claude_skills_dir="$claude_dir/skills"
 [[ $claude_dir == /* && $claude_dir != / ]] || die "CLAUDE_CONFIG_DIR must be an absolute config directory: $claude_dir"
 [[ -f $agents_source ]] || die "Missing source file: $agents_source"
 [[ -d $skills_source ]] || die "Missing source directory: $skills_source"
+repo_git_dir=$(resolve_git_common_dir "$repo_dir") || die "Could not identify Git repository: $repo_dir"
 
 skill_count=0
 for skill_dir in "$skills_source"/*; do
@@ -172,6 +186,52 @@ ensure_skill_dir() {
     fi
 }
 
+remove_obsolete_skill_links() {
+    local dir=$1
+    local target
+    local link_source
+    local source_dir
+    local source_repo_dir
+    local source_git_dir
+    local source_name
+    local target_name
+    local current_source
+
+    for target in "$dir"/*; do
+        [[ -L $target ]] || continue
+
+        link_source=$(readlink -- "$target") || die "Could not read symlink: $target"
+        if [[ $link_source != /* ]]; then
+            link_source="$(dirname -- "$target")/$link_source"
+        fi
+
+        source_dir=$(CDPATH= cd -- "$(dirname -- "$link_source")" 2>/dev/null && pwd -P) || continue
+        source_repo_dir=$(CDPATH= cd -- "$source_dir/.." 2>/dev/null && pwd -P) || continue
+        [[ $source_dir == "$source_repo_dir/skills" ]] || continue
+
+        source_git_dir=$(resolve_git_common_dir "$source_repo_dir") || continue
+        [[ $source_git_dir == "$repo_git_dir" ]] || continue
+
+        source_name=${link_source##*/}
+        target_name=${target##*/}
+        current_source="$skills_source/$source_name"
+
+        if [[ $target_name == "$source_name" ]]; then
+            [[ -d $current_source && $target -ef $current_source ]] && continue
+        elif [[ $target_name != "$source_name.backup."* ]]; then
+            continue
+        fi
+
+        if $dry_run; then
+            status DRY-RUN "Would remove obsolete skill link $target -> $link_source"
+        elif rm -- "$target"; then
+            status REMOVE "$target -> $link_source"
+        else
+            die "Could not remove obsolete skill link: $target"
+        fi
+    done
+}
+
 ensure_link() {
     local source=$1
     local target=$2
@@ -204,6 +264,9 @@ ensure_config_dir "$codex_dir"
 ensure_config_dir "$claude_dir"
 ensure_skill_dir "$agents_skills_dir"
 ensure_skill_dir "$claude_skills_dir"
+
+remove_obsolete_skill_links "$agents_skills_dir"
+remove_obsolete_skill_links "$claude_skills_dir"
 
 ensure_link "$agents_source" "$codex_dir/AGENTS.md"
 ensure_link "$agents_source" "$claude_dir/CLAUDE.md"
