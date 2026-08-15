@@ -64,7 +64,9 @@ If a target already contains another file, directory, or incorrect symlink, the 
 <target>.backup.YYYYMMDD-HHMMSS
 ```
 
-Backups are never deleted automatically. The script does not overwrite existing configuration and can be run repeatedly. Correct symlinks remain unchanged.
+Backups of conflicting files, directories, and third-party symlinks are never deleted automatically. The script does not overwrite existing configuration and can be run repeatedly. Correct symlinks remain unchanged.
+
+When a skill is removed from this repository, the next install removes its stale symlinks. It also removes Forge symlink backups left by older installer runs. The installer recognizes Forge links across Git worktrees, while symlinks to third-party skill directories remain unchanged.
 
 To restore a backup, remove the generated symlink and move the backup to its original name.
 
