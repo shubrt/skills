@@ -116,6 +116,12 @@ for skill_dir in "$skills_source"/*; do
 done
 ((skill_count > 0)) || die "No skills found in: $skills_source"
 
+# Linking a broken skill breaks it in both tools at once, so validate first.
+# Uninstalling only removes links and stays available when the tree is broken.
+if ! $uninstall_mode; then
+    "$script_dir/check.sh" || die 'Repository checks failed. Fix the problems above, then install again.'
+fi
+
 timestamp=$(date '+%Y%m%d-%H%M%S')
 last_backup=''
 
