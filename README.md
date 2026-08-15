@@ -85,3 +85,18 @@ To restore a backup, remove the generated symlink and move the backup to its ori
 ## Adding skills
 
 Create a new skill at `skills/<name>/SKILL.md`, then run the installation script again. Existing skill links do not need to be reinstalled after content changes.
+
+## Checks
+
+```bash
+./bin/check.sh
+```
+
+Installation runs this first and refuses to link anything when it fails, because a broken skill breaks both tools at once. Uninstallation skips it, so the way back stays open. The checks cover what a broken file does not report on its own:
+
+- `name` in the frontmatter matches the directory name, otherwise the skill never loads.
+- `description` exists, stays on one line, and stays under 1024 characters, otherwise the router silently truncates it.
+- `SKILL.md` stays under 500 lines. Longer content belongs in a reference file.
+- A frontmatter field outside the six the Agent Skills spec defines is tool-specific, so the skill also needs `agents/openai.yaml` to behave the same in Codex.
+- Tracked Markdown contains no em dashes.
+- Tracked shell scripts parse, and pass `shellcheck` when it is installed.
