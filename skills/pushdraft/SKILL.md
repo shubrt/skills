@@ -1,10 +1,10 @@
 ---
-name: postplan
+name: pushdraft
 description: Use when the user asks to communicate through an HTML document, or if they mention "HTML" with no additional context.
 metadata:
     harness: [claude, codex]
     platform: [darwin, linux]
-    requires: "npx (postplan is run via npx)"
+    requires: "npx (pushdraft is run via npx)"
 ---
 
 # HTML Communication
@@ -43,7 +43,7 @@ When the user asks for variants:
 -  Render real styled variants, not descriptions.
 -  Label them `A`, `B`, `C`... for easy selection.
 -  Lay them out for direct comparison.
--  Keep one file across iterations so its Postplan URL stays stable.
+-  Reuse the same absolute path across iterations so its Pushdraft URL stays stable.
 
 ## Publish
 
@@ -52,14 +52,19 @@ with this skill. Upload is required, including in Auto mode. Do not ask for
 separate permission or stop at the local file.
 
 1. Write the HTML file locally.
-2. Run `npx postplan upload <file path>`.
-3. Report the local path and returned Postplan URL.
+2. Run `npx pushdraft upload <file path>`.
+3. After the upload succeeds, delete that exact local HTML file.
+4. Report the returned Pushdraft URL.
 
-Re-upload the same absolute path to update the existing URL. Use
-`npx postplan upload <file path> --new` only when a new draft is wanted.
+Re-create and upload the same absolute path to update the existing URL. Use
+`npx pushdraft upload <file path> --new` only when a new draft is wanted.
+
+Never leave a local HTML file behind after a successful upload. If the upload
+fails, keep the file only to fix and retry it, then delete it after the retry
+succeeds.
 
 If validation fails, fix the markup and retry. If a scripted upload needs
-authentication, ask the user to run `postplan auth login`, then retry without
+authentication, ask the user to run `pushdraft auth login`, then retry without
 removing the requested interactivity.
 
 Never open a browser or claim the document is hosted before upload succeeds.
