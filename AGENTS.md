@@ -42,6 +42,12 @@ I wanted to share some of my preferences here so we can be more aligned as we wo
 
 * Never touch production, live databases, or daily-driver build/preview channels unless explicitly told to. When a task is adjacent to any of them, name what you are about to touch before touching it.
 
+## Git branches
+
+* Before the first push or pull request, rename a current `t3code/*` branch to the same suffix under `shubrt/*`.
+* If the suffix is still a temporary eight-character hash, choose a descriptive `shubrt/*` branch name instead.
+* Never push a branch to a remote under `t3code/*`.
+
 ## Pull Requests
 
 * Open PRs with the `open-pr` skill, monitor them with `babysit-pr`. The skills hold the procedure: title conventions, description shape, rebase, no drafts, and the closing note about model and harness.
