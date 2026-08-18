@@ -1,0 +1,4 @@
+interface:
+  display_name: "TypeScript"
+  short_description: "Apply TypeScript coding preferences"
+  default_prompt: "Use $typescript when implementing or reviewing TypeScript code."

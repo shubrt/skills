@@ -14,14 +14,6 @@ I wanted to share some of my preferences here so we can be more aligned as we wo
 * Comments are a great way to clarify functionality and how code is used. Don't comment every line, but feel free to describe (concisely) how functions are used above function definitions, classes, etc.
 * Keep comments up to date! When making changes, it's important to keep things in sync.
 
-## Coding preferences (Typescript focused)
-
-* `any` is the enemy. Inferred types are our friend. Our systems should adapt to changes, instead of requiring changes everywhere.
-* If your TS code looks like a Python dev wrote it, it is bad TS code.
-* Avoid one-line functions that are just casting wrappers.
-* Write TypeScript in ways that Matt Pocock and Theo would be proud of.
-* When building more complex web and react native apps, I like to pull in Zustand, React Query, Tanstack Start, Clerk (or better-auth if selfhosting), and ArkType (or zod if perf isn't an issue)
-
 ## Questions are read-only
 
 * A question is a request for an answer, not for changes. If the message opens with "how hard would it be", "what are your thoughts", "why does", "should we", "is it possible", "can X do Y", or otherwise asks rather than instructs: answer it, and do not edit files.
