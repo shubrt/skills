@@ -1,6 +1,6 @@
-# Forge
+# Skills
 
-Forge is the central, tool-independent home for my global agent configuration.
+This repository is the central, tool-independent home for my global agent configuration.
 Instructions and skills are maintained once and shared by Claude Code and Codex.
 The repository remains the single source of truth for all self-managed global agent rules.
 
@@ -30,7 +30,7 @@ Then install the links:
 From another working directory, run the script using its absolute path:
 
 ```bash
-/path/to/forge/bin/install.sh
+/path/to/skills/bin/install.sh
 ```
 
 Installation only runs from the main checkout. A linked Git worktree is refused, because removing that worktree would break the global configuration of both tools at once. The error message names the correct path.
@@ -59,7 +59,7 @@ Each repository skill is linked into both tools separately:
 ~/.claude/skills/<name> -> <repository>/skills/<name>
 ```
 
-The skill directories remain intact. Existing, synced, and tool-specific skills can continue to live alongside Forge skills.
+The skill directories remain intact. Existing, synced, and tool-specific skills can continue to live alongside the skills managed here.
 
 Codex uses `${CODEX_HOME}` instead of `~/.codex` when the variable is set. Claude Code uses `${CLAUDE_CONFIG_DIR}` instead of `~/.claude`.
 
@@ -76,7 +76,7 @@ If a target already contains another file, directory, or incorrect symlink, the 
 
 Backups of conflicting files, directories, and third-party symlinks are never deleted automatically. The script does not overwrite existing configuration and can be run repeatedly. Correct symlinks remain unchanged.
 
-When a skill is removed from this repository, the next install removes its stale symlinks. It also removes Forge symlink backups left by older installer runs, both in the skill directories and next to `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md`. The installer recognizes Forge links across Git worktrees, while symlinks to third-party skill directories remain unchanged.
+When a skill is removed from this repository, the next install removes its stale symlinks. It also removes symlink backups left by older installer runs, both in the skill directories and next to `~/.codex/AGENTS.md` and `~/.claude/CLAUDE.md`. The installer recognizes links from this repository across Git worktrees, while symlinks to third-party skill directories remain unchanged.
 
 A backup symlink whose target no longer exists cannot be attributed to this repository. The installer reports it as `WARN` and leaves the removal to you.
 
