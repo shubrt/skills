@@ -6,7 +6,7 @@ The repository remains the single source of truth for all self-managed global ag
 
 ## Structure
 
-- `AGENTS.md` contains the global instructions.
+- `instructions/AGENTS.md` contains the global instructions.
 - `skills/<name>/SKILL.md` contains a reusable skill.
 - `bin/install.sh` links the repository to Claude Code and Codex.
 - Shared support files can live in `references/`, `templates/`, or `scripts/`.
@@ -48,8 +48,8 @@ This removes the instruction and skill symlinks that point into this repository,
 The global instructions are linked directly:
 
 ```text
-~/.codex/AGENTS.md   -> <repository>/AGENTS.md
-~/.claude/CLAUDE.md -> <repository>/AGENTS.md
+~/.codex/AGENTS.md   -> <repository>/instructions/AGENTS.md
+~/.claude/CLAUDE.md -> <repository>/instructions/AGENTS.md
 ```
 
 Each repository skill is linked into both tools separately:
@@ -65,7 +65,7 @@ Codex uses `${CODEX_HOME}` instead of `~/.codex` when the variable is set. Claud
 
 ## Safety and backups
 
-After installation, changes to `AGENTS.md` and existing skills affect both tools immediately.
+After installation, changes to `instructions/AGENTS.md` and existing skills affect both tools immediately.
 Review repository changes before applying them.
 
 If a target already contains another file, directory, or incorrect symlink, the script moves it to a timestamped backup:
