@@ -95,7 +95,7 @@ done
 script_dir=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 repo_dir=$(CDPATH= cd -- "$script_dir/.." && pwd -P)
 
-agents_source="$repo_dir/AGENTS.md"
+agents_source="$repo_dir/instructions/AGENTS.md"
 skills_source="$repo_dir/skills"
 codex_dir=${CODEX_HOME:-"$HOME/.codex"}
 claude_dir=${CLAUDE_CONFIG_DIR:-"$HOME/.claude"}
