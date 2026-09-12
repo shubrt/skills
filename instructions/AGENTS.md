@@ -30,6 +30,11 @@ I wanted to share some of my preferences here so we can be more aligned as we wo
 * Standing constraints: dark mode, true black (`#000`) background, white primary text. Information-dense, no decorative card/pill chrome, no light-gray subtitle lines above sections. Minimal copy. No em dashes.
 * Avoid continuously repainting CSS animations (pulse, shimmer, blur, spinners); they peg the GPU on high-refresh displays.
 
+## Writing
+
+* Anything I read as prose goes through the `unslop` skill before you send it. That covers chat answers of more than a few lines, PR and issue descriptions, commit bodies, docs, and every HTML document. Code and code comments are exempt.
+* The skill says "must always apply" in its own description, but the description alone does not make it load. Treat this line as the trigger.
+
 ## Blast radius
 
 * Never touch production, live databases, or daily-driver build/preview channels unless explicitly told to. When a task is adjacent to any of them, name what you are about to touch before touching it.
