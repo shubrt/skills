@@ -1,6 +1,6 @@
 ---
 name: pushdraft
-description: Use when the user asks to communicate through an HTML document, or if they mention "HTML" with no additional context.
+description: Deliver a finished write-up as a shareable HTML document. Use for a report, analysis, summary, findings, spec, plan, comparison, ranking, or set of UI mocks, including when the request is mostly a research job and "HTML" is only one word in it, and whenever the user mentions "HTML" with no additional context. This is the delivery path, not a chart library, so it still applies when dataviz shapes the charts inside the document. Not for HTML that ships as part of a product.
 metadata:
     harness: [claude, codex]
     platform: [darwin, linux]
@@ -12,7 +12,12 @@ metadata:
 ## When to Use
 
 Use this skill when the user wants a plan, spec, write-up, findings, summary,
-report, comparison, or set of UI mocks presented as readable HTML.
+report, comparison, ranking, or set of UI mocks presented as readable HTML. It
+applies when the HTML is only how the result gets delivered, so a long research
+or analysis prompt that ends in "as an HTML report" belongs here too.
+
+`dataviz` does not replace this skill. It decides how a chart looks, this skill
+decides what the document is and where it goes. A report with charts needs both.
 
 Do not use it for HTML that ships as part of a product.
 
@@ -26,9 +31,12 @@ Create one self-contained HTML file, capped at 512 KB.
   secondary surfaces or accents.
 -  Make it mobile-readable with a responsive viewport and no fixed-width layout.
 -  Use semantic HTML, inline CSS, inline SVG, and HTTPS or data-URL images.
--  Use an inline classic script only when interactivity materially helps. Keep
-  scripted pages useful without JavaScript; the sandbox blocks storage, fetch,
-  workers, frames, forms, and popups.
+-  Build every heading, number, table, and chart into the markup before upload.
+  Never generate content at runtime. The viewer ran no inline script at all on
+  2026-09-12, and a report that drew itself in JavaScript arrived blank.
+-  Use an inline classic script only to improve a page that already reads
+  correctly without it. The sandbox blocks storage, fetch, workers, frames,
+  forms, and popups.
 -  In script-free files, give external links `target="_blank"` and
   `rel="noopener noreferrer"`. If any script exists, omit `target="_blank"`.
 
