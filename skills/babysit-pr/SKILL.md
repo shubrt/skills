@@ -8,6 +8,8 @@ metadata:
 
 # Babysit PR
 
+Needs a shell with `gh`. Without command execution, say so and stop. Never report a step you could not run as done.
+
 Keep one pull request moving without adding noise to it.
 
 ## Scope
