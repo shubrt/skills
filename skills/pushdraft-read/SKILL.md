@@ -9,6 +9,8 @@ metadata:
 
 # Pushdraft Read
 
+Needs a shell with `curl` and `jq`. Without command execution, say so and stop. Never substitute a browser or web search.
+
 Fetch the uploaded HTML with the shell. Do not use web search or a browser.
 
 1. Remove a trailing slash, then append `/raw` unless the URL already ends in `/raw`.

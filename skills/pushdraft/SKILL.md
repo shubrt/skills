@@ -9,6 +9,8 @@ metadata:
 
 # HTML Communication
 
+Needs a shell with `npx` and local file access. Without both, say so and stop. Never claim a document is published without a returned URL.
+
 ## When to Use
 
 Use this skill when the user wants a plan, spec, write-up, findings, summary,

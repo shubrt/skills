@@ -9,6 +9,8 @@ metadata:
 
 # Documentation Lookup
 
+Needs a shell with `npx`. Without command execution, say so and stop, and do not answer from memory or web search instead.
+
 Retrieve current documentation and code examples for any library using the Context7 CLI.
 
 Make sure the CLI is up to date before running commands:
