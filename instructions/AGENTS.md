@@ -32,6 +32,8 @@ I wanted to share some of my preferences here so we can be more aligned as we wo
 
 ## Writing
 
+* Reply in chat using the language I use, usually German.
+* Write all generated artifacts and repository content in English, regardless of the language I use in chat, unless I explicitly request another language for that output. This includes code, comments, documentation, UI text, commit messages, and PR or issue titles, descriptions, and comments.
 * Anything I read as prose goes through the `unslop` skill before you send it. That covers chat answers of more than a few lines, PR and issue descriptions, commit bodies, docs, and every HTML document. Code and code comments are exempt.
 * The skill says "must always apply" in its own description, but the description alone does not make it load. Treat this line as the trigger.
 
