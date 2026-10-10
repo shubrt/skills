@@ -1,6 +1,6 @@
 ---
 name: pushdraft-read
-description: Use when the user provides a pushdraft.dev URL to read.
+description: Use when the user provides a Pushdraft URL to read, on draft.shubrt.me or the former pushdraft.dev.
 metadata:
     harness: [claude, codex]
     platform: [darwin, linux]
@@ -13,9 +13,10 @@ Needs a shell with `curl` and `jq`. Without command execution, say so and stop. 
 
 Fetch the uploaded HTML with the shell. Do not use web search or a browser.
 
-1. Remove a trailing slash, then append `/raw` unless the URL already ends in `/raw`.
-2. Run `(PUSHDRAFT_API_KEY=$(jq -er '.apiKey' "$HOME/.pushdraft/credentials.json") && curl --fail --silent --show-error --location --max-time 30 --header "Authorization: Bearer ${PUSHDRAFT_API_KEY}" --output /tmp/pushdraft.html '<raw-url>')`.
-3. Read `/tmp/pushdraft.html` and continue the user's request from its contents.
+1. If the host is `pushdraft.dev` or `<draft-id>.pushdraft.dev`, replace `pushdraft.dev` with `draft.shubrt.me`. The old domain only redirects, and curl does not send the Authorization header to another host after a redirect.
+2. Remove a trailing slash, then append `/raw` unless the URL already ends in `/raw`.
+3. Run `(PUSHDRAFT_API_KEY=$(jq -er '.apiKey' "$HOME/.pushdraft/credentials.json") && curl --fail --silent --show-error --location --max-time 30 --header "Authorization: Bearer ${PUSHDRAFT_API_KEY}" --output /tmp/pushdraft.html '<raw-url>')`.
+4. Read `/tmp/pushdraft.html` and continue the user's request from its contents.
 
 If credentials are missing, ask the user to run `pushdraft auth login`, then retry.
 If `curl` fails, report its actual status or network error. Do not substitute search results.
