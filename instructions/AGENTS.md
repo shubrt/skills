@@ -44,4 +44,4 @@ I wanted to share some of my preferences here so we can be more aligned as we wo
 
 ## Pull Requests
 
-* Open PRs with the `open-pr` skill, monitor them with `babysit-pr`. The skills hold the procedure: title conventions, description shape, rebase, no drafts, and the closing note about model and harness.
+* Open PRs with the `file-pr` skill, monitor them with `babysit-pr`. The skills hold the procedure: title conventions, description shape, rebase, no drafts, and the closing note about model and harness.
