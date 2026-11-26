@@ -4,6 +4,16 @@ I love to build. I focus on building complex things as simple as possible. I lov
 
 I wanted to share some of my preferences here so we can be more aligned as we work together.
 
+## Open every final reply with where we stand
+
+* Your final reply opens with a three-item list, then the answer. I reopen threads days later and read the last message first, so one-line answers carry it too. A subagent reporting to a parent agent skips it.
+  * `Ziel:` what this thread is for. Change it only when I change it.
+  * `Stand:` where it stands as you send, including what this turn changed. If the turn ends before the work, the plan you will run.
+  * `Weiter:` the next step, what you need from me, or `nichts offen`.
+* About ten words per line. In English: `Goal`, `Status`, `Next`, and `nothing open`.
+* Rewrite all three each turn from the thread as you still have it. Replace, never append.
+* Leave the detail to the answer below. unslop does not touch these three lines.
+
 ## Coding preferences - general
 
 * Keep things simple. Channel "yagni" energy unless told otherwise.
